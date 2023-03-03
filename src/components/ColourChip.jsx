@@ -14,26 +14,26 @@ const path = `path('
 ')`
 
 
-const getPath = ({ rx, ry, r, ratio, start, arc }) => {
+const getPath = ({ cx, cy, r, ratio, start, arc }) => {
   const innerRadius = r * ratio
   const startRad = Math.PI * start / 180
   const endAngle = start + arc
   const endRad = Math.PI * (endAngle) / 180  
 
   // Calculate from start
-  const startX = rx + ( r *  Math.sin(startRad) )
-  const startY = ry - ( r *  Math.cos(startRad) )
+  const startX = cx + ( r *  Math.sin(startRad) )
+  const startY = cy - ( r *  Math.cos(startRad) )
 
   // Calculate from start + arc
-  const outerX = rx + ( r * Math.sin(endRad) )
-  const outerY = ry - ( r * Math.cos(endRad) )
+  const outerX = cx + ( r * Math.sin(endRad) )
+  const outerY = cy - ( r * Math.cos(endRad) )
 
   // Calculate from start + arc and ratio
-  const innerX = rx + innerRadius * Math.sin(endRad) 
-  const innerY = ry - innerRadius * Math.cos(endRad)
+  const innerX = cx + innerRadius * Math.sin(endRad) 
+  const innerY = cy - innerRadius * Math.cos(endRad)
   // Calculate from start and ratio
-  const endX = rx + innerRadius * Math.sin(startRad) 
-  const endY = ry - innerRadius * Math.cos(startRad)
+  const endX = cx + innerRadius * Math.sin(startRad) 
+  const endY = cy - innerRadius * Math.cos(startRad)
 
   return `path('
     M ${startX} ${startY}
@@ -56,11 +56,8 @@ const StyledChip = styled.div`
 `
 
 export const ColourChip = (props) => {
-  
-
   return (
     <StyledChip
-      className="chip"
       { ...props }
     >
 

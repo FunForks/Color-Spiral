@@ -4,6 +4,10 @@
 
 import styled from 'styled-components'
 import { ColourChip } from './ColourChip'
+import {
+  getGoldenAngleAt,
+  getColor
+} from '../tools/colors'
 
 
 const StyledDiv = styled.div`
@@ -12,38 +16,47 @@ const StyledDiv = styled.div`
   width: var(--size);
   height: var(--size);
   border-radius: var(--size);
-  background-color: #222
+  background-color: #000
 `
+
 
 export const ColourPicker = () => {
   const { width, height } = document.body.getBoundingClientRect()
 
-  const r = Math.min(width, height) / 2
-  const [ rx, ry ] = [ r, r ]
-  const ratio = 0.8
-  const arc = 60
+  let r = Math.min(width, height) / 2
+  let l = 0.4
+  const [ cx, cy ] = [ r, r ]
+  const ratio = 0.863
+  const arc = 52.3
+  const reduce = 0.97
+  const offset = -0.25
 
   const shared = {
-    rx,
-    ry,
+    cx,
+    cy,
     r,
     ratio,
     arc
   }
+  
 
-  const chips = [ 
-    { start: 0, bgColor: "#900"},
-    { start: 60, bgColor: "#990"},
-    { start: 120, bgColor: "#090"},
-    { start: 180, bgColor: "#099"},
-    { start: 240, bgColor: "#009"},
-    { start: 300, bgColor: "#909"}
-  ].map( props => (
+  const chips = Array(128).fill(0).map(( _, number ) => {
+    r = r * reduce
+    l = l * reduce
+    const start = getGoldenAngleAt(number)
+    const bgColor = getColor({ number, l, offset })
+
+    return (
       <ColourChip
-        key={props.bgColor}
-        { ...{ ...props, ...shared } }
+        key={number}
+        { ...shared }
+        start={start}
+        bgColor={bgColor}
+        r={r}
       />
-    ))
+    )
+  })
+
 
   return (
     <StyledDiv>

@@ -80,8 +80,14 @@ export const translucify = (color, opacity) => {
 
 // https://stackoverflow.com/a/20129594/1927589
 // https://qph.fs.quoracdn.net/main-qimg-aaa9a544d797f1109b29c55814319195.webp
-export const getColor = ({ number, s=0.5, l=0.33, format="hsl" }) => {
-  const h = number * 137.50776405 // ≈ golden angle: 180*(3-√5)
+export const getColor = ({ 
+  number,
+  s=0.5,
+  l=0.33,
+  offset=0,
+  format="hsl"
+}) => {
+  const h = (number - offset) * 137.50776405 // ≈ golden angle: 180*(3-√5)
 
   s = Math.max(0, Math.min(s, 1))
   l = Math.max(0, Math.min(l, 1))
@@ -217,4 +223,15 @@ export const buttonColors = (color, values) => {
   ))
 
   return output
+}
+
+
+
+const GOLDEN_ANGLE = 180 * (3 - Math.sqrt(5)) // 137.50776405003785
+
+export const getGoldenAngleAt = index => {
+  let angle = index * GOLDEN_ANGLE
+  angle -= Math.floor(angle / 360) * 360 // 0.0 ≤ angle < 360.0
+
+  return angle
 }
