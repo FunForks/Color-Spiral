@@ -1,9 +1,12 @@
+import { ColourProvider } from './contexts/ColourContext.jsx'
 import { ColourPicker } from "./components/ColourPicker";
 
 
 function App() {
   return (
-    <ColourPicker />
+    <ColourProvider>
+      <ColourPicker />
+    </ColourProvider>
   );
 }
 

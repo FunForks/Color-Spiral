@@ -2,7 +2,9 @@
  * ColourPicker.jsx
  */
 
+
 import styled from 'styled-components'
+
 import { ColourChip } from './ColourChip'
 import {
   getGoldenAngleAt,
@@ -16,20 +18,29 @@ const StyledDiv = styled.div`
   width: var(--size);
   height: var(--size);
   border-radius: var(--size);
-  background-color: #000
+  background-color: #000;
+  border: 1px solid #333;
+  box-sizing: border-box;
 `
 
 
 export const ColourPicker = () => {
   const { width, height } = document.body.getBoundingClientRect()
 
-  let r = Math.min(width, height) / 2
-  let l = 0.4
+  let r = Math.min(width, height) / 2 // will reduce progressively
+  // <<< HARD-CODED
+  const reduce = 0.9505               // by this much
+
+  let l = 0.33       // will reduce progressively
+  const fade = 0.98  // by this much
+
+  const s = 1.0
+  const ratio = 0.6667
+  const arc = 52.5
+  const offset = 0 // -0.25
+  // HARD-CODED >>>
+
   const [ cx, cy ] = [ r, r ]
-  const ratio = 0.863
-  const arc = 52.3
-  const reduce = 0.97
-  const offset = -0.25
 
   const shared = {
     cx,
@@ -40,19 +51,27 @@ export const ColourPicker = () => {
   }
   
 
-  const chips = Array(128).fill(0).map(( _, number ) => {
+  const chips = Array(64).fill(0).map(( _, number ) => {
+    const radius = r
+    const start = getGoldenAngleAt(number) - arc / 2
+    const bgcolor = getColor({ number, l, s, offset })
+
+    const midradians = Math.PI * (start + arc / 2) / 180
+    const midradius = r * (1 + ratio) / 2
+
     r = r * reduce
-    l = l * reduce
-    const start = getGoldenAngleAt(number)
-    const bgColor = getColor({ number, l, offset })
+    l = l * fade
 
     return (
       <ColourChip
         key={number}
         { ...shared }
         start={start}
-        bgColor={bgColor}
-        r={r}
+        number={number}
+        bgcolor={bgcolor}
+        r={radius}
+        midradians={midradians}
+        midradius={midradius}
       />
     )
   })
