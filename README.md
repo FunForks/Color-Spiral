@@ -1,32 +1,11 @@
-# Barebones React App
+# Color Spiral #
 
-This project was created using `npx create-react-app`, and then stripping out all unnecessary files. This leaves about:
+This proof-of-concept project displays a spiral of colours which fit together in a _Golden Ratio_ sequence.
 
-* 1 KB of data in the `public/` and `src/` folders
-* 40 KB in the hidden `.git` folder
-* Over ***260 MB*** (yes, that's "megabytes") of boilerplate in the `node_modules/` folder.
+Suppose you want each player in a game to have an avatar with a different colour, but you don't know how many players there will be. Using hues that are separated from each other by (the Golden Angle)[https://medium.com/@winwardo/simple-non-repeating-colour-generation-6efc995832b8] means that a series of consecutive colours are optimally far apart.
 
-## A starting point for all your new projects
-Rather than running `npx create-react-app my-new-project-name` and waiting for all the latest node modules to be downloaded from the Internet, you can simply copy this folder to a new location and start developing as soon as the local copy process is finished.
+The numbers indicate the order in which the colours were generated
 
-## Notes concerning the GitHub repository
-No `node_modules` files are stored on GitHub. All the information concerning the Node modules that need to be installed are found in `package.json`.
-
-If you clone this repository from GitHub, then you'll need to run `npm install`, and wait while the Node modules are downloaded.
-
-## First steps
-
-0. Copy this folder to the directory where you want to work from. **Do not alter this original folder, so that you can use it again as the starting point for other projects.**
-1. Rename the copied folder with the name of your project
-2. Open `package.json` and change the value of the`"name"` property, to match your project's name
-4. Open `public/index.html` and change the text in the title tag, to suit your project:
-   ```
-   <head>
-    <title>App name?</title>
-   </head>
-   ```
-5. Run `npm start` to see the placeholder app in the browser
-6. Open `src/App.js` and start writing your own components
-7. Replace this `README.md` file with a description of your own project
+If you click on a colour chip, you will toggle the way it is displayed. This is just a simulation. In a real project, this might indicate that the colour has already been selected by another player.
 
 ## Enjoy!
