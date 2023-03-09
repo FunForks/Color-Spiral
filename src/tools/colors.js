@@ -227,7 +227,8 @@ export const buttonColors = (color, values) => {
 
 
 
-const GOLDEN_ANGLE = 180 * (3 - Math.sqrt(5)) // 137.50776405003785
+export const GOLDEN_ANGLE = 180 * (3 - Math.sqrt(5))
+// 137.50776405003785
 
 export const getGoldenAngleAt = index => {
   let angle = index * GOLDEN_ANGLE

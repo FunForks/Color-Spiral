@@ -9,6 +9,7 @@ import styled from 'styled-components'
 import { ColourContext } from '../contexts/ColourContext'
 
 
+// Functions for generating CSS
 
 const getPath = ({ cx, cy, r, ratio, start, arc }) => {
   const innerRadius = r * ratio
@@ -41,13 +42,15 @@ const getPath = ({ cx, cy, r, ratio, start, arc }) => {
 }
 
 
-const getAfterPath = ({ cx, cy, r, ratio, start, arc }) => {
-  // <<< HARD-CODED
-  r     *= 0.99
-  start += 0.7
-  arc   -= 1.4
-  ratio /= 0.975
-  // HARD-CODED >>>
+const getAfterPath = ({
+  cx,
+  cy,
+  hr:     r,
+  hratio: ratio,
+  hstart: start,
+  harc:   arc
+}) => {
+
   return getPath({ cx, cy, r, ratio, start, arc })
 }
 
@@ -101,26 +104,26 @@ const StyledChip = styled.div`
 `
 
 
-
+// Component
 
 export const ColourChip = (props) => {
   const { colours, setColours } = useContext(ColourContext)
-  const { number } = props
+  const { index } = props
 
-  const toggleColour = number => {
-    const index = colours.indexOf(number)
+  const toggleColour = colourIndex => {
+    const index = colours.indexOf(colourIndex)
     if (index < 0) {
-      colours.push(number)
+      colours.push(colourIndex)
 
     } else {
       colours.splice(index, 1)
     }
 
-    setColours([...colours])
+    setColours([ ...colours ])
   }
 
 
-  const className = colours.indexOf(props.number) < 0
+  const className = colours.indexOf(index) < 0
                   ? ""
                   : "taken"
 
@@ -129,12 +132,12 @@ export const ColourChip = (props) => {
     <StyledChip
       { ...props }
       className={className}
-      onClick={() => toggleColour(number)}
+      onClick={() => toggleColour(index)}
     >
       <span
         { ...props }
       >
-        {number + 1}
+        {index + 1}
       </span>
     </StyledChip>
   )
