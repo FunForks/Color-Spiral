@@ -1,5 +1,16 @@
 /// COLOR FUNCTIONS //
 
+export const GOLDEN_ANGLE = 180 * (3 - Math.sqrt(5))
+// 137.50776405003785
+
+export const getGoldenAngleAt = index => {
+  let angle = index * GOLDEN_ANGLE
+  angle -= Math.floor(angle / 360) * 360 // 0.0 ≤ angle < 360.0
+
+  return angle
+}
+
+
 
 export const rgbify = (color) => {
   if (color.substring(0, 3).toLowerCase() === "hsl" ) {
@@ -87,7 +98,7 @@ export const getColor = ({
   offset=0,
   format="hsl"
 }) => {
-  const h = (number - offset) * 137.50776405 // ≈ golden angle: 180*(3-√5)
+  const h = ((number - offset) * GOLDEN_ANGLE) % 360
 
   s = Math.max(0, Math.min(s, 1))
   l = Math.max(0, Math.min(l, 1))
@@ -223,16 +234,4 @@ export const buttonColors = (color, values) => {
   ))
 
   return output
-}
-
-
-
-export const GOLDEN_ANGLE = 180 * (3 - Math.sqrt(5))
-// 137.50776405003785
-
-export const getGoldenAngleAt = index => {
-  let angle = index * GOLDEN_ANGLE
-  angle -= Math.floor(angle / 360) * 360 // 0.0 ≤ angle < 360.0
-
-  return angle
 }

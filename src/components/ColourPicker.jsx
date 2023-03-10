@@ -6,11 +6,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
 import { ColourChip } from './ColourChip'
-import {
-  GOLDEN_ANGLE,
-  getGoldenAngleAt,
-  getColor
-} from '../tools/colors'
+import { getGoldenAngleAt } from '../tools/colors'
+import { getChipColours } from '../api/colourGenerator'
 
 
 
@@ -28,17 +25,8 @@ const StyledDiv = styled.div`
 
 /***************************************************************
  ** HARD-CODED **** HARD-CODED *** HARD-CODED **** HARD-CODED **
- **                                                           **
- ** DO NOT CHANGE COLOUR SETTINGS AFTER THE PROJECT GOES LIVE **
- ** OR THE COLOURS THAT ARE GENERATED MAY CHANGE UNEXPECTEDLY **
  ***************************************************************/
 const SETTINGS = {
-  // Colour settings
-  luminosity:             0.3333,
-  fadeRatioForLuminosity: 0.98,
-  saturation:             1.0,
-  firstHueDegrees:        30, // 0 = red, 120 = green, 240 = blue
-  
   // Layout settings
   arcDegrees:         52.5,
   firstChipDegrees:  -26.25,
@@ -80,13 +68,7 @@ export const ColourPicker = () => {
   useEffect(resize, [])
 
 
-  let { luminosity: l } = SETTINGS
   const {
-    // Colour settings
-    fadeRatioForLuminosity,
-    saturation:         s,
-    firstHueDegrees,
-
     // Layout settings
     arcDegrees:         arc,
     firstChipDegrees,
@@ -99,9 +81,8 @@ export const ColourPicker = () => {
     selectedInnerRatio
   } = SETTINGS
 
-  const firstHueOffset = firstHueDegrees / GOLDEN_ANGLE
-  const hratio         = ratio * selectedInnerRatio
-  const harc           = arc - selectedEdge * 2
+  const hratio = ratio * selectedInnerRatio
+  const harc   = arc - selectedEdge * 2
 
 
   const shared = {
@@ -115,17 +96,16 @@ export const ColourPicker = () => {
 
   const chips = Array(64).fill(0).map(( _, index ) => {
     const radius = r // r will be reduced for next chip, below
-    const number = index + firstHueOffset
-
-    const start   = getGoldenAngleAt(index) + firstChipDegrees
-    const bgcolor = getColor({ number, l, s })
+    const start  = getGoldenAngleAt(index) + firstChipDegrees
+    const colors = getChipColours(index)
+    // { bgcolor, hicolor, locolor }
 
     // Calculate where to centre the number span
     const midradians = Math.PI * (start + arc / 2) / 180
     const midradius  = r * (1 + ratio) / 2
 
     // Selection/highlight dimensions
-    const highlighting = {
+    const highlightDimensions = {
       hr: r * selectedRadius,
       harc,
       hstart: start + selectedEdge,
@@ -134,7 +114,6 @@ export const ColourPicker = () => {
 
     // Prepare for next chip
     r = r * reduce
-    l = l * fadeRatioForLuminosity
 
     return (
       <ColourChip
@@ -142,11 +121,11 @@ export const ColourPicker = () => {
         { ...shared }
         start={start}
         index={index}
-        bgcolor={bgcolor}
         r={radius}
         midradians={midradians}
         midradius={midradius}
-        { ...highlighting }
+        { ...colors }
+        { ...highlightDimensions }
       />
     )
   })

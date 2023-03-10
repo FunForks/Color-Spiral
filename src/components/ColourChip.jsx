@@ -83,6 +83,11 @@ const StyledChip = styled.div`
   background-color: ${props => props.bgcolor};
   cursor: pointer;
 
+  &.taken {
+    background-color: ${props => props.locolor};
+    cursor: grab; /* no "revert" cursor is available */
+  }
+
   &.taken::after {
     content: '';
     position: absolute;
@@ -91,15 +96,17 @@ const StyledChip = styled.div`
     bottom: 0;
     right: 0;
     clip-path: ${props => getAfterPath(props)};
-    background-color: #0009;
+    background-color: ${props => props.bgcolor};
   }
 
   & span {
     ${props => getSpanCSS(props)};
+    color: #000;
+    z-index: 1;
   }
 
   &.taken span {
-    color: #000;
+    color: ${props => props.locolor};
   }
 `
 
