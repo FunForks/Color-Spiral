@@ -2,11 +2,9 @@
  * ColourChip.jsx
  */
 
-import { useContext } from 'react'
 
 import styled from 'styled-components'
 
-import { ColourContext } from '../contexts/ColourContext'
 
 
 // Functions for generating CSS
@@ -114,32 +112,17 @@ const StyledChip = styled.div`
 // Component
 
 export const ColourChip = (props) => {
-  const { colours, setColours } = useContext(ColourContext)
-  const { index } = props
+  const { index, taken, setColour } = props
 
-  const toggleColour = colourIndex => {
-    const index = colours.indexOf(colourIndex)
-    if (index < 0) {
-      colours.push(colourIndex)
-
-    } else {
-      colours.splice(index, 1)
-    }
-
-    setColours([ ...colours ])
-  }
-
-
-  const className = colours.indexOf(index) < 0
-                  ? ""
-                  : "taken"
-
+  const className = taken
+                  ? "taken"
+                  : ""
 
   return (
     <StyledChip
       { ...props }
       className={className}
-      onClick={() => toggleColour(index)}
+      onClick={() => setColour(index)}
     >
       <span
         { ...props }

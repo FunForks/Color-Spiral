@@ -1,13 +1,11 @@
 import { ColourProvider } from './contexts/ColourContext.jsx'
-import { ColourPicker } from "./components/ColourPicker";
-import { ColourButton } from "./components/ColourButton";
+import { ColourItems } from "./components/ColourItems";
 
 
 function App() {
   return (
     <ColourProvider>
-      <ColourButton />
-      <ColourPicker />
+      <ColourItems />
     </ColourProvider>
   );
 }
