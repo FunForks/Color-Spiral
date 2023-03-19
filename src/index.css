@@ -7,11 +7,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   
   min-height: 100vh;
-  background-color: #181818;
+  background-color: #222;
   color: #fff;
 
   display: flex;
   justify-content: center;
   align-items: center;
+
+  overflow-x: hidden;
 }
 

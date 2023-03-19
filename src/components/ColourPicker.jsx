@@ -11,38 +11,45 @@ import { getChipColours } from '../api/colourGenerator'
 
 
 const StyledDiv = styled.div`
+  --size: 1em; /* MUST BE 1em: ALL CALCULATIONS ARE BASED ON THIS */
+  --transition: 250ms ease-out;
   position: relative;
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  z-index: ${props => props.open ? 1 : 0};
-
-  // --size: 90vmin;
-  // position: absolute;
-  // top: 0;
-  // left: 0;
-  // width: var(--size);
-  // height: var(--size);
-  // border-radius: var(--size);
-  // background-color: #000;
-  // border: 1px solid #333;
-  // box-sizing: border-box;
+  width: var(--size);
+  height: var(--size);
+  left: 0;
+  top: 0;
+  ${props => props.open
+           ? `left: ${props.offsetX}px;
+              top: ${props.offsetY}px;
+              z-index: 1;
+              transition: var(--transition);
+              `
+           : ""
+  };
 `
 
 
 const StyledChips = styled.div`
-  --scale: ${props => props.scale}em;
-  --offset: calc((var(--scale) - 1em) / -2);
-  position: absolute;
-  width: var(--scale);
-  height: var(--scale);
-  border-radius: var(--scale);
-  background-color: #181818;
-  border: 1px outset #6663;
-  filter: drop-shadow(4px 4px 4px #000);
+  --scale: ${props => props.scale};
+  --size: calc(1em * var(--scale));
+  --offset: calc((var(--size) - 1em) / -2);
 
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  border-radius: var(--size);
+  box-sizing: border-box;
+  background-color: inherit;
+  filter: drop-shadow(1em 1em 1em #000);
   top: var(--offset);
   left: var(--offset);
+
+  ${props =>
+    props.open
+    ? `transition: var(--transition);`
+    : `transform: scale(calc(1 / var(--scale)));`
+  }
 `
 
 
@@ -80,7 +87,7 @@ const SETTINGS = {
 
   // Optimal size
   scale: 30, //  5 //  9 // 10 // 15 // 20 // 30 // 40 // 60 // 80
-  total: 62  // 33 // 44 // 49 // 57 // 62 // 70 // 75 // 83 // 89
+  total: 70  // 33 // 44 // 49 // 57 // 62 // 70 // 75 // 83 // 89
 }
 /***************************************************************
  ** HARD-CODED **** HARD-CODED *** HARD-CODED **** HARD-CODED **
@@ -102,7 +109,14 @@ export const ColourPicker = (props) => {
   const pickerRef = useRef()
 
 
-  const [ sizes, setSizes ] = useState({ r: 0, cx: 0, cy: 0, scale: 1})
+  const [ sizes, setSizes ] = useState({
+    r: 0,
+    cx: 0,
+    cy: 0,
+    scale: 1,
+    offsetX: 0,
+    offsetY: 0
+  })
   let { r } = sizes
   const { cx, cy } = sizes
 
@@ -124,20 +138,42 @@ export const ColourPicker = (props) => {
 
 
   const resize = () => {
+    // Calculate optimal scale for smaller viewports
     const picker =  pickerRef.current
-    const { width, height } = picker.getBoundingClientRect()
+    const {
+      top,
+      left,
+      right,
+      bottom,
+      width,
+      height,
+    } = picker.getBoundingClientRect()
     const {
       width: portWidth,
       height: portHeight
     } = document.body.getBoundingClientRect()
     const scale = Math.min(
       portWidth / width,
-      portHeight/ height,
+      portHeight / height,
       SETTINGS.scale
     )
+
+    // Calculate offset to ensure Picker is fully onscreen
+    const flange = (width * (scale - 1) / 2)
+    let offsetX = flange - left // move right if needed
+    if (offsetX < 0) {
+      // move left if needed
+      offsetX = Math.min(0, portWidth - (right + flange))
+    }
+    let offsetY = flange - top // move down if needed
+    if (offsetY < 0) {
+      // move up if needed
+      offsetY = Math.min(0, portHeight - (bottom + flange))
+    }
+
     const r = (Math.min(width, height) / 2) * scale
     const [ cx, cy ] = [ r, r ]
-    setSizes({ r, cx, cy, scale })
+    setSizes({ r, cx, cy, scale, offsetX, offsetY })
 
     window.addEventListener("resize", resize, {once: true})
   }
@@ -187,6 +223,10 @@ export const ColourPicker = (props) => {
 
 
   const chips = Array(total).fill(0).map(( _, index ) => {
+    if (!open) {
+      return ""
+    }
+
     const radius = r // r will be reduced for next chip, below
     const start  = getGoldenAngleAt(index) + firstChipDegrees
     const colors = getChipColours(index)
@@ -230,15 +270,15 @@ export const ColourPicker = (props) => {
     <StyledDiv
       ref={pickerRef}
       open={open}
+      offsetX={sizes.offsetX}
+      offsetY={sizes.offsetY}
     >
-      { open && (
-        <StyledChips
-          scale={sizes.scale}
-        >
-          {chips}
-        </StyledChips>
-       )
-      }
+      <StyledChips
+        scale={ sizes.scale }
+        open={open}
+      >
+        {chips}
+      </StyledChips>
       <StyledButton
         onClick={toggleOpen}
         open={open}
