@@ -31,16 +31,18 @@ const StyledDiv = styled.div`
 
 
 const StyledChips = styled.div`
+  --scale: ${props => props.scale}em;
+  --offset: calc((var(--scale) - 1em) / -2);
   position: absolute;
-  width: 19em;
-  height: 19em;
-  border-radius: 19em;
+  width: var(--scale);
+  height: var(--scale);
+  border-radius: var(--scale);
   background-color: #181818;
   border: 1px outset #6663;
   filter: drop-shadow(4px 4px 4px #000);
 
-  top: -9em;
-  left: -9em;
+  top: var(--offset);
+  left: var(--offset);
 `
 
 
@@ -55,7 +57,6 @@ const StyledButton = styled.div`
     0.1em
     ${props => props.open ? "solid" : "outset"}
     ${props => props.bgcolor};
-  // top: -1em;
 `
 
 /***************************************************************
@@ -75,7 +76,11 @@ const SETTINGS = {
   // Selection/highlight settings
   selectedRadius:     0.99,
   selectedEdge:       0.7,
-  selectedInnerRatio: 1.025
+  selectedInnerRatio: 1.025,
+
+  // Optimal size
+  scale: 30, //  5 //  9 // 10 // 15 // 20 // 30 // 40 // 60 // 80
+  total: 62  // 33 // 44 // 49 // 57 // 62 // 70 // 75 // 83 // 89
 }
 /***************************************************************
  ** HARD-CODED **** HARD-CODED *** HARD-CODED **** HARD-CODED **
@@ -97,18 +102,42 @@ export const ColourPicker = (props) => {
   const pickerRef = useRef()
 
 
-  const [ sizes, setSizes ] = useState({ r: 0, cx: 0, cy: 0})
+  const [ sizes, setSizes ] = useState({ r: 0, cx: 0, cy: 0, scale: 1})
   let { r } = sizes
   const { cx, cy } = sizes
 
+
+  const {
+    // Layout settings
+    arcDegrees:         arc,
+    firstChipDegrees,
+    innerRadiusRatio:   ratio,
+    radiusReduction:    reduce,
+
+    // Selection/highlight settings
+    selectedRadius,
+    selectedEdge,
+    selectedInnerRatio,
+
+    total
+  } = SETTINGS
 
 
   const resize = () => {
     const picker =  pickerRef.current
     const { width, height } = picker.getBoundingClientRect()
-    const r = (Math.min(width, height) / 2) * 19
+    const {
+      width: portWidth,
+      height: portHeight
+    } = document.body.getBoundingClientRect()
+    const scale = Math.min(
+      portWidth / width,
+      portHeight/ height,
+      SETTINGS.scale
+    )
+    const r = (Math.min(width, height) / 2) * scale
     const [ cx, cy ] = [ r, r ]
-    setSizes({ r, cx, cy })
+    setSizes({ r, cx, cy, scale })
 
     window.addEventListener("resize", resize, {once: true})
   }
@@ -139,20 +168,6 @@ export const ColourPicker = (props) => {
     setOpen(!open)
   }
 
-
-  const {
-    // Layout settings
-    arcDegrees:         arc,
-    firstChipDegrees,
-    innerRadiusRatio:   ratio,
-    radiusReduction:    reduce,
-
-    // Selection/highlight settings
-    selectedRadius,
-    selectedEdge,
-    selectedInnerRatio
-  } = SETTINGS
-
   const hratio = ratio * selectedInnerRatio
   const harc   = arc - selectedEdge * 2
 
@@ -171,7 +186,7 @@ export const ColourPicker = (props) => {
   }
 
 
-  const chips = Array(64).fill(0).map(( _, index ) => {
+  const chips = Array(total).fill(0).map(( _, index ) => {
     const radius = r // r will be reduced for next chip, below
     const start  = getGoldenAngleAt(index) + firstChipDegrees
     const colors = getChipColours(index)
@@ -217,7 +232,9 @@ export const ColourPicker = (props) => {
       open={open}
     >
       { open && (
-        <StyledChips>
+        <StyledChips
+          scale={sizes.scale}
+        >
           {chips}
         </StyledChips>
        )
