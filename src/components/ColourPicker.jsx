@@ -98,17 +98,16 @@ const SETTINGS = {
 
 export const ColourPicker = (props) => {
   const {
- // name,         // string (unused here)
-    index,        // integer originally used to calculate colour
-    colour,       // hex representation of colour
-    colours,      // [ { name, index, colour }, ... ]
-    updateColours // function
+ // name,            // string (unused here)
+    index: selected, // integer originally used to calculate colour
+    colour,          // hex representation of colour
+    colours,         // [ { name, index, colour }, ... ]
+    updateColours    // function
   } = props
+
 
   const [ open, setOpen ] = useState(false)
   const pickerRef = useRef()
-
-
   const [ sizes, setSizes ] = useState({
     r: 0,
     cx: 0,
@@ -120,6 +119,8 @@ export const ColourPicker = (props) => {
   let { r } = sizes
   const { cx, cy } = sizes
 
+  const checked = colours.map( colour => colour.index)
+                         .filter( index => index !== selected)
 
   const {
     // Layout settings
@@ -259,8 +260,9 @@ export const ColourPicker = (props) => {
         { ...colors }
         { ...highlightDimensions }
 
+        checked={checked.indexOf(index) >= 0}
+        selected={selected === index}
         onClick={setColour}
-        // taken={false}
       />
     )
   })

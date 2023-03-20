@@ -81,12 +81,18 @@ const StyledChip = styled.div`
   background-color: ${props => props.bgcolor};
   cursor: pointer;
 
-  &.taken {
-    background-color: ${props => props.locolor};
+  &.checked,
+  &.selected {
     cursor: grab; /* no "revert" cursor is available */
   }
+  &.checked {
+    background-color: #888; // ${props => props.locolor};
+  }
+  &.selected {
+    background-color: ${props => props.hicolor};
+  }
 
-  &.taken::after {
+  &::after {
     content: '';
     position: absolute;
     top: 0;
@@ -94,7 +100,11 @@ const StyledChip = styled.div`
     bottom: 0;
     right: 0;
     clip-path: ${props => getAfterPath(props)};
-    background-color: ${props => props.bgcolor};
+  }
+
+  &.checked::after,
+  &.selected::after {
+      background-color: ${props => props.bgcolor};
   }
 
   & span {
@@ -103,8 +113,12 @@ const StyledChip = styled.div`
     z-index: 1;
   }
 
-  &.taken span {
+  &.checked span {
     color: ${props => props.locolor};
+  }
+
+  &.selected span {
+    color: #fff; // ${props => props.hicolor};
   }
 `
 
@@ -112,11 +126,39 @@ const StyledChip = styled.div`
 // Component
 
 export const ColourChip = (props) => {
-  const { index, taken, setColour } = props
+  const { index, setColour, selected, checked } = props
 
-  const className = taken
-                  ? "taken"
-                  : ""
+  // cx, cy, r, ratio, start, arc
+  // console.log("props:", props);
+  // key:        <not a prop; undefined>
+  // index:      0
+  // r:          115.95833587646484 p
+  // cx:         115.95833587646484 psa
+  // cy:         115.95833587646484 psa
+  // ratio:      0.6667             p
+  // arc:        52.5               p
+  // start:      -26.25             p
+  // midradians: 0                   s
+  // midradius:  96.63387920265198   s
+  // harc:       51.1                 a
+  // hr:         114.7987525177002    a
+  // hratio:     0.6833674999999999   a
+  // hstart:    -25.55                a
+  // bgcolor:    "#aa5500"
+  // hicolor:    "#d46a00"
+  // locolor:    "#7f3f00"
+  // checked:    <boolean>
+  // selected:   <boolean>
+  // onClick:    function setColour()
+  //
+  // p=getPath; s=getSpanCSS; a=getAfterPath
+
+
+  const className = selected
+                  ? "selected"
+                  : checked
+                    ? "checked"
+                    : ""
 
   return (
     <StyledChip

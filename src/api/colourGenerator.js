@@ -37,7 +37,7 @@ const fadeRatioForLuminosity = 0.98
 const saturation             = 1.0
 const firstHueDegrees        = 30 // 0: red, 120: green, 240: blue
 const highlightRatio         = 1.25
-const darkenRatio            = 0.75
+const darkenRatio            = 0.85
 /****************************************************************
  ** HARD-CODED **** HARD-CODED **** HARD-CODED **** HARD-CODED **
  ****************************************************************/
@@ -60,7 +60,7 @@ export const getChipColours = number => {
 
   const colors = {
     bgcolor,
-    hicolor: toneColor(bgcolor, highlightRatio),
+    hicolor: "#fff", // toneColor(bgcolor, highlightRatio),
     locolor: toneColor(bgcolor, darkenRatio)
   }
 
