@@ -10,9 +10,9 @@ export const ColourContext = createContext()
 
 const getDefault = () => {
   return [
-    {name: "Client", index: 1, colour: "#900"},
-    {name: "Клиент", index: 3, colour: "#090"},
-    {name: "Cliente", index: 6, colour: "#009"}
+    { name: "Client", index: 1 },
+    { name: "Клиент", index: 3 },
+    { name: "Cliente", index: 6 }
   ]
 }
 

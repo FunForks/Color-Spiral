@@ -98,11 +98,9 @@ const SETTINGS = {
 
 export const ColourPicker = (props) => {
   const {
- // name,            // string (unused here)
-    index: selected, // integer originally used to calculate colour
-    colour,          // hex representation of colour
+    item,           // { name, index, colour }
     colours,         // [ { name, index, colour }, ... ]
-    updateColours    // function
+    setColours    // function
   } = props
 
 
@@ -120,7 +118,7 @@ export const ColourPicker = (props) => {
   const { cx, cy } = sizes
 
   const checked = colours.map( colour => colour.index)
-                         .filter( index => index !== selected)
+                         .filter( index => index !== item.index)
 
   const {
     // Layout settings
@@ -137,6 +135,15 @@ export const ColourPicker = (props) => {
     total
   } = SETTINGS
 
+
+  const { bgcolor } = getChipColours(item.index)
+
+  const updateColours = () => {
+    // The appropriate object in the colours array will
+    // already have been updated
+    setColours([ ...colours ])
+    setOpen(false)
+  }
 
   const resize = () => {
     // Calculate optimal scale for smaller viewports
@@ -196,6 +203,10 @@ export const ColourPicker = (props) => {
         if (!(pickerRef.current).contains(event.target)) {
           // The click was not on the Picker, so close it.
           setOpen(false)
+        } else {
+          if (!event.target.closest(".available")) {
+            window.addEventListener("mousedown", listener, options)
+          }
         }
       }
 
@@ -215,11 +226,6 @@ export const ColourPicker = (props) => {
     r,
     ratio,
     arc
-  }
-
-
-  const setColour = () => {
-
   }
 
 
@@ -257,12 +263,12 @@ export const ColourPicker = (props) => {
         r={radius}
         midradians={midradians}
         midradius={midradius}
+        item={item}
         { ...colors }
         { ...highlightDimensions }
 
         checked={checked.indexOf(index) >= 0}
-        selected={selected === index}
-        onClick={setColour}
+        updateColours={updateColours}
       />
     )
   })
@@ -284,7 +290,7 @@ export const ColourPicker = (props) => {
       <StyledButton
         onClick={toggleOpen}
         open={open}
-        bgcolor={colour}
+        bgcolor={bgcolor}
       />
     </StyledDiv>
   )

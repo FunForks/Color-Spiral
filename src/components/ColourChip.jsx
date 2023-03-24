@@ -83,7 +83,7 @@ const StyledChip = styled.div`
 
   &.checked,
   &.selected {
-    cursor: grab; /* no "revert" cursor is available */
+    cursor: default
   }
   &.checked {
     background-color: #888; // ${props => props.locolor};
@@ -104,7 +104,7 @@ const StyledChip = styled.div`
 
   &.checked::after,
   &.selected::after {
-      background-color: ${props => props.bgcolor};
+    background-color: ${props => props.bgcolor};
   }
 
   & span {
@@ -126,10 +126,10 @@ const StyledChip = styled.div`
 // Component
 
 export const ColourChip = (props) => {
-  const { index, setColour, selected, checked } = props
+  const { index, item, checked, updateColours } = props
 
-  // cx, cy, r, ratio, start, arc
   // console.log("props:", props);
+  //
   // key:        <not a prop; undefined>
   // index:      0
   // r:          115.95833587646484 p
@@ -153,18 +153,30 @@ export const ColourChip = (props) => {
   //
   // p=getPath; s=getSpanCSS; a=getAfterPath
 
+  const newColour = () => {
+    if (className === "available") {
+      item.index = index
+      updateColours()
+    }
+  }
 
-  const className = selected
+
+  // .selected will appear with a highlight
+  // .checked will appear with desaturated colours
+  // .available will allow a colour change
+  // Any element without .available will have no effect other
+  // than to allow another click outside the Picker to close it.
+  const className = item.index === index
                   ? "selected"
                   : checked
                     ? "checked"
-                    : ""
+                    : "available"
 
   return (
     <StyledChip
       { ...props }
       className={className}
-      onClick={() => setColour(index)}
+      onClick={newColour}
     >
       <span
         { ...props }

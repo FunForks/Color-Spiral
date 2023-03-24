@@ -34,12 +34,6 @@ const StyledItem = styled.li`
 export const ColourItems = (props) => {
   const { colours, setColours } = useContext(ColourContext)
 
-  const updateColours = () => {
-    // The appropriate object in the colours array will
-    // already have been updated
-    setColours([ ...colours ])
-  }
-
   const items = colours.map( item => {
     // { name: <string>, index: <integer> colour: <hex> }
     return (
@@ -47,9 +41,9 @@ export const ColourItems = (props) => {
         key={item.name}
       >
         <ColourItem 
-          { ...item }
+          item={item}
           colours={colours} // to provide names as tooltips
-          updateColours={updateColours}
+          setColours={setColours}
         />
       </StyledItem>
     )
