@@ -26,7 +26,7 @@ const StyledItem = styled.li`
 
   & > span {
     display: inline-block;
-    width: 4em;
+    width: 6em;
   }
 `
 

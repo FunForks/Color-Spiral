@@ -10,9 +10,14 @@ export const ColourContext = createContext()
 
 const getDefault = () => {
   return [
-    { name: "Client", index: 1 },
-    { name: "Клиент", index: 3 },
-    { name: "Cliente", index: 6 }
+    { name: "Client", index: 0 },
+    { name: "Klient", index: 3 },
+    { name: "Cliente", index: 6 },
+    { name: "Клиент", index: 1 },
+    { name: "عميل", index: 4 },
+    { name: "ग्राहक", index: 7 },
+    { name: "客户", index: 5 },
+    { name: "取り引き先", index: 10 }
   ]
 }
 

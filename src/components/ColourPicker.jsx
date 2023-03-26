@@ -78,7 +78,9 @@ const SETTINGS = {
   arcDegrees:         52.5,
   firstChipDegrees:  -26.25, // half of arcDegrees
   innerRadiusRatio:   0.6667,
+  textRadiusRatio:    0.825,
   radiusReduction:    0.9505,
+  fontRatio:          0.166667,
 
   // Selection/highlight settings
   selectedRadius:     0.99,
@@ -98,8 +100,8 @@ const SETTINGS = {
 
 export const ColourPicker = (props) => {
   const {
-    item,           // { name, index, colour }
-    colours,         // [ { name, index, colour }, ... ]
+    item,           // { name, index }
+    colours,         // [ { name, index }, ... ]
     setColours    // function
   } = props
 
@@ -107,6 +109,7 @@ export const ColourPicker = (props) => {
   const [ open, setOpen ] = useState(false)
   const pickerRef = useRef()
   const [ sizes, setSizes ] = useState({
+    size: 0,
     r: 0,
     cx: 0,
     cy: 0,
@@ -115,17 +118,24 @@ export const ColourPicker = (props) => {
     offsetY: 0
   })
   let { r } = sizes
-  const { cx, cy } = sizes
+  const { size, cx, cy } = sizes
 
   const checked = colours.map( colour => colour.index)
                          .filter( index => index !== item.index)
+
+  const indexedNames = colours.reduce((map, {index, name}) => {
+    map[index] = name
+    return map
+  }, {})
 
   const {
     // Layout settings
     arcDegrees:         arc,
     firstChipDegrees,
     innerRadiusRatio:   ratio,
+    textRadiusRatio,
     radiusReduction:    reduce,
+    fontRatio,
 
     // Selection/highlight settings
     selectedRadius,
@@ -179,9 +189,10 @@ export const ColourPicker = (props) => {
       offsetY = Math.min(0, portHeight - (bottom + flange))
     }
 
-    const r = (Math.min(width, height) / 2) * scale
+    const size = Math.min(width, height) * scale
+    const r = size / 2
     const [ cx, cy ] = [ r, r ]
-    setSizes({ r, cx, cy, scale, offsetX, offsetY })
+    setSizes({ size, r, cx, cy, scale, offsetX, offsetY })
 
     window.addEventListener("resize", resize, {once: true})
   }
@@ -216,8 +227,8 @@ export const ColourPicker = (props) => {
     setOpen(!open)
   }
 
-  const hratio = ratio * selectedInnerRatio
-  const harc   = arc - selectedEdge * 2
+  const hRatio = ratio * selectedInnerRatio
+  const hArc   = arc - selectedEdge * 2
 
 
   const shared = {
@@ -234,21 +245,23 @@ export const ColourPicker = (props) => {
       return ""
     }
 
+    const name = indexedNames[index] || ""
+
     const radius = r // r will be reduced for next chip, below
     const start  = getGoldenAngleAt(index) + firstChipDegrees
     const colors = getChipColours(index)
     // { bgcolor, hicolor, locolor }
 
     // Calculate where to centre the number span
-    const midradians = Math.PI * (start + arc / 2) / 180
-    const midradius  = r * (1 + ratio) / 2
+    const midRadians = Math.PI * (start + arc / 2) / 180
+    const midRadius  = r * (1 + ratio) / 2
 
     // Selection/highlight dimensions
     const highlightDimensions = {
       hr: r * selectedRadius,
-      harc,
-      hstart: start + selectedEdge,
-      hratio
+      hArc,
+      hStart: start + selectedEdge,
+      hRatio
     }
 
     // Prepare for next chip
@@ -257,16 +270,20 @@ export const ColourPicker = (props) => {
     return (
       <ColourChip
         key={index}
+        index={index}
+        name={name}
         { ...shared }
         start={start}
-        index={index}
         r={radius}
-        midradians={midradians}
-        midradius={midradius}
-        item={item}
-        { ...colors }
+        size={size}
+        midRadians={midRadians}
+        midRadius={midRadius}
+        textRadius={r * textRadiusRatio}
+        fontRatio={fontRatio}
         { ...highlightDimensions }
+        { ...colors }
 
+        item={item}
         checked={checked.indexOf(index) >= 0}
         updateColours={updateColours}
       />

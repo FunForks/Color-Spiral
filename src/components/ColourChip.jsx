@@ -44,30 +44,55 @@ const getAfterPath = ({
   cx,
   cy,
   hr:     r,
-  hratio: ratio,
-  hstart: start,
-  harc:   arc
+  hRatio: ratio,
+  hStart: start,
+  hArc:   arc
 }) => {
 
   return getPath({ cx, cy, r, ratio, start, arc })
 }
 
 
-const getSpanCSS = ({ cx, cy, midradius, midradians }) => {
-  const left = cx + ( midradius *  Math.sin(midradians) )
-  const top = cy - ( midradius *  Math.cos(midradians) )
-  let size = midradius / 5
-  if (size < 7) {
-    size = 0
-  }
+const getTextPath = ({ cx, cy, textRadius: r, start, arc }) => {
+  const startRad = Math.PI * start / 180
+  const endAngle = start + arc
+  const endRad = Math.PI * (endAngle) / 180
+
+  // Calculate from start
+  const startX = cx + ( r *  Math.sin(startRad) )
+  const startY = cy - ( r *  Math.cos(startRad) )
+
+  // Calculate from start + arc
+  const endX = cx + ( r * Math.sin(endRad) )
+  const endY = cy - ( r * Math.cos(endRad) )
+
+  return `
+    M ${startX} ${startY}
+    A ${r} ${r} ${arc} 0 1 ${endX} ${endY}
+  `
+}
+
+
+const getSpanCSS = ({ cx, cy, midRadius, midRadians }) => {
+  const left = cx + ( midRadius *  Math.sin(midRadians) )
+  const top = cy - ( midRadius *  Math.cos(midRadians) )
 
   return `
   position: absolute;
   top: ${top}px;
   left: ${left}px;
-  font-size: ${size}px;
   transform: translate(-50%, -50%);
   `
+}
+
+
+const getFontSize = ({ midRadius, fontRatio }) => {
+  let size = midRadius * fontRatio
+  if (size < 7) {
+    size = 0
+  }
+
+  return size+"px"
 }
 
 
@@ -77,8 +102,9 @@ const StyledChip = styled.div`
   left: 0;
   bottom: 0;
   right: 0;
-  clip-path: ${props => getPath(props)};
+  clip-path: ${props => props.clipPath};
   background-color: ${props => props.bgcolor};
+  font-size: ${props => props.fontSize};
   cursor: pointer;
 
   &.checked,
@@ -99,7 +125,7 @@ const StyledChip = styled.div`
     left: 0;
     bottom: 0;
     right: 0;
-    clip-path: ${props => getAfterPath(props)};
+    clip-path: ${props => props.afterPath};
   }
 
   &.checked::after,
@@ -108,7 +134,7 @@ const StyledChip = styled.div`
   }
 
   & span {
-    ${props => getSpanCSS(props)};
+    ${props => props.spanCSS};
     color: #000;
     z-index: 1;
   }
@@ -120,36 +146,48 @@ const StyledChip = styled.div`
   &.selected span {
     color: #fff; // ${props => props.hicolor};
   }
+
+  & svg {
+    position: relative;
+    z-index: 2;
+    fill: #fff9;
+  }
+  &.selected svg {
+    fill: #fff;
+  }
 `
 
 
 // Component
 
 export const ColourChip = (props) => {
-  const { index, item, checked, updateColours } = props
+  const { index, name, item, checked, updateColours, size } = props
+  const id = `${name}_${index}`
 
   // console.log("props:", props);
   //
-  // key:        <not a prop; undefined>
-  // index:      0
-  // r:          115.95833587646484 p
-  // cx:         115.95833587646484 psa
-  // cy:         115.95833587646484 psa
-  // ratio:      0.6667             p
-  // arc:        52.5               p
-  // start:      -26.25             p
-  // midradians: 0                   s
-  // midradius:  96.63387920265198   s
-  // harc:       51.1                 a
-  // hr:         114.7987525177002    a
-  // hratio:     0.6833674999999999   a
-  // hstart:    -25.55                a
-  // bgcolor:    "#aa5500"
-  // hicolor:    "#d46a00"
-  // locolor:    "#7f3f00"
-  // checked:    <boolean>
-  // selected:   <boolean>
-  // onClick:    function setColour()
+  // key:           <not a prop; undefined>
+  // index:         0
+  // name:          ""
+  // r:             115.95833587646484 p
+  // cx:            115.95833587646484 psa
+  // cy:            115.95833587646484 psa
+  // ratio:         0.6667             p
+  // arc:           52.5               p
+  // start:         -26.25             p
+  // midRadians:    0                   s
+  // midRadius:     96.63387920265198   s
+  // hArc:          51.1                 a
+  // hr:            114.7987525177002    a
+  // hRatio:        0.6833674999999999   a
+  // hStart:       -25.55                a
+  // bgcolor:       "#aa5500"
+  // hicolor:       "#d46a00"
+  // locolor:       "#7f3f00"
+  // checked:       <boolean>
+  // selected:      <boolean>
+  // updateColours: <function>
+  // item:          { name: "Client", index: 0 }
   //
   // p=getPath; s=getSpanCSS; a=getAfterPath
 
@@ -160,6 +198,29 @@ export const ColourChip = (props) => {
     }
   }
 
+
+  const svg = (
+    <svg
+      width={size}
+      height={size}
+    >
+      <path
+        id={id}
+        d={getTextPath(props)}
+        fill="none"
+      />
+      <text>
+        <textPath
+          alignmentBaseline="top"
+          xlinkHref={`#${id}`}
+          startOffset="50%"
+          textAnchor="middle"
+        >
+          {name}
+        </textPath>
+      </text>
+    </svg>
+  )
 
   // .selected will appear with a highlight
   // .checked will appear with desaturated colours
@@ -172,17 +233,29 @@ export const ColourChip = (props) => {
                     ? "checked"
                     : "available"
 
+  const clipPath  = getPath(props);
+  const afterPath = getAfterPath(props);
+  const fontSize  = getFontSize(props)
+  const spanCSS   = getSpanCSS(props);
+
+
   return (
     <StyledChip
-      { ...props }
+      clipPath={clipPath}
+      afterPath={afterPath}
+      spanCSS={spanCSS}
+      bgcolor={props.bgcolor}
+      locolor={props.locolor}
+      hicolor={props.hicolor}
+      fontSize={fontSize}
+
       className={className}
       onClick={newColour}
     >
-      <span
-        { ...props }
-      >
+      {/* <span>
         {index + 1}
-      </span>
+      </span> */}
+      {svg}
     </StyledChip>
   )
 }
