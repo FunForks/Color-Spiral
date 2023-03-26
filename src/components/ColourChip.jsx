@@ -161,7 +161,14 @@ const StyledChip = styled.div`
 // Component
 
 export const ColourChip = (props) => {
-  const { index, name, item, checked, updateColours, size } = props
+  const {
+    index,
+    name,
+    item,
+    checked,
+    updateColours,
+    toggleChipColour,
+    size } = props
   const id = `${name}_${index}`
 
   // console.log("props:", props);
@@ -191,11 +198,23 @@ export const ColourChip = (props) => {
   //
   // p=getPath; s=getSpanCSS; a=getAfterPath
 
+  const selected = item.index === index
+
+
   const newColour = () => {
     if (className === "available") {
       item.index = index
       updateColours()
     }
+  }
+
+
+  const updateCentre = (event) => {
+    const revert = event.type === "mouseleave"
+                || selected
+                || checked
+    const colour = revert ? undefined : index
+    toggleChipColour(colour)
   }
 
 
@@ -227,7 +246,7 @@ export const ColourChip = (props) => {
   // .available will allow a colour change
   // Any element without .available will have no effect other
   // than to allow another click outside the Picker to close it.
-  const className = item.index === index
+  const className = selected
                   ? "selected"
                   : checked
                     ? "checked"
@@ -251,6 +270,8 @@ export const ColourChip = (props) => {
 
       className={className}
       onClick={newColour}
+      onMouseEnter={updateCentre}
+      onMouseLeave={updateCentre}
     >
       {/* <span>
         {index + 1}

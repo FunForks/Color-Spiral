@@ -58,12 +58,12 @@ const StyledButton = styled.div`
   width: 1em;
   height: 1em;
   border-radius: 1em;
-  background-color: ${props => props.bgcolor};
+  background-color: ${props => props.chipColour};
   box-sizing: border-box;
   border:
     0.1em
     ${props => props.open ? "solid" : "outset"}
-    ${props => props.bgcolor};
+    ${props => props.chipColour};
 `
 
 /***************************************************************
@@ -147,6 +147,8 @@ export const ColourPicker = (props) => {
 
 
   const { bgcolor } = getChipColours(item.index)
+  const [ chipColour, setChipColour ] = useState(bgcolor)
+
 
   const updateColours = () => {
     // The appropriate object in the colours array will
@@ -240,6 +242,12 @@ export const ColourPicker = (props) => {
   }
 
 
+  const toggleChipColour = ( index=item.index ) => {
+    const { bgcolor } =  getChipColours(index)
+    setChipColour(bgcolor)
+  }
+
+
   const chips = Array(total).fill(0).map(( _, index ) => {
     if (!open) {
       return ""
@@ -286,6 +294,7 @@ export const ColourPicker = (props) => {
         item={item}
         checked={checked.indexOf(index) >= 0}
         updateColours={updateColours}
+        toggleChipColour={toggleChipColour}
       />
     )
   })
@@ -307,7 +316,7 @@ export const ColourPicker = (props) => {
       <StyledButton
         onClick={toggleOpen}
         open={open}
-        bgcolor={bgcolor}
+        chipColour={chipColour}
       />
     </StyledDiv>
   )
